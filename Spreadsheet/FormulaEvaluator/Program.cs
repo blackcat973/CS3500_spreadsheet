@@ -1,10 +1,7 @@
 ﻿namespace FormulaEvaluator
 {
-    internal class Program
+    public static class Evaluator
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
+        // TODO: Follow the PS1 instructions
     }
 }
