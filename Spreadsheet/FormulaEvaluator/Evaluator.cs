@@ -11,7 +11,7 @@ using System.Threading.Tasks;
  *  
  *  @author     SangYoon Cho
  *  @date       2022/09/02 (Y/M/D)
- *  @version    1.2 ver
+ *  @version    1.3 ver
  *                  -> Misunderstood about Extension methods concept.
  *                  -> Modified the code with using Extension methods.
  */
@@ -23,8 +23,6 @@ using System.Threading.Tasks;
  */
 namespace EvaExtentions
 {
-    using System;
-
     public static class Extensions
     {
         /// <summary>
@@ -238,7 +236,7 @@ namespace EvaExtentions
 /**
  * This namespace is for actual Evaluator.
  */
-namespace Test3500
+namespace FormulaEvaluator
 {
     /// <summary>
     /// This class includes every class for evaluation.
@@ -296,7 +294,7 @@ namespace Test3500
                     try
                     {
                         bool checkString = s.Any(char.IsDigit);
-                        // 1
+                        // Exception 1
                         // Check if string doesn't include the integer, throw exception
                         if (!checkString)
                             throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
@@ -311,16 +309,16 @@ namespace Test3500
                 }
             }
 
-            // exception - 2
+            // Exception 2
             if (valueStack.Count == 0 && operatorStack.Count == 0)
                 throw new ArgumentException("Cannot use empty string.");
-            // 3
+            // Exception 3
             else if (valueStack.Count == 0 && operatorStack.Count >= 1)
                 throw new ArgumentException("There is no variable.");
-            // 4
+            // Exception 4
             else if (valueStack.Count == 1 && operatorStack.Count >= 1)
                 throw new ArgumentException("Input too many operators.");
-            // 5
+            // Exception 5
             else if (valueStack.Count >= 2 + operatorStack.Count)
                 throw new ArgumentException("Operator is not enough.");
 
