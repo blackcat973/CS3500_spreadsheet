@@ -1,4 +1,5 @@
 ﻿using System;
+using EvaExtentions;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,120 +12,28 @@ using System.Threading.Tasks;
  *  @author     SangYoon Cho
  *  @date       2022/09/02 (Y/M/D)
  *  @version    1.2 ver
- *                  -> Merge isMoreThanTwo and isMoreThanOne to countStackValue
- *                     and modify if condition.
+ *                  -> Misunderstood about Extension methods concept.
+ *                  -> Modified the code with using Extension methods.
  */
 
-namespace FormulaEvaluator
+
+/**
+ * This namespace is for Extiontion methods for Evaluator.
+ * It invokes stack push method with string(token) variable, and operator calculation helper methods. *
+ */
+namespace EvaExtentions
 {
-    /// <summary>
-    /// This class includes every class for evaluation.
-    /// It splits input string to store every single data type into each proper type of the stack
-    /// for checking integer or token.
-    /// </summary>
-    public static class Evaluator
+    using System;
+
+    public static class Extensions
     {
-        /// <summary>
-        /// Delegate for input variable (not integer).
-        /// </summary>
-        /// <param name="v"> First string parameter </param>
-        /// <returns> int value for converting string to int </returns>
-        public delegate int Lookup(string v);
-        /// <summary>
-        /// This method splits string and stores data into the proper stack such as
-        /// if data is an integer, it is stored into the int stack.
-        /// Also it returns result value of the arithmetic expression.
-        /// </summary>
-        /// <param name="exp"> Input string </param>
-        /// <param name="variableEvaluator"> 
-        /// If there's an variable, delegate change it to the integer what user want to input 
-        /// </param>
-        /// <returns> The result of the arithmetic expression </returns>
-        /// <exception cref="ArgumentException">
-        /// There are 5 exceptions. Every exception throws ArgumentException
-        /// Exception 1. If variable doesn't consist of one or more letters followed by the number 
-        /// Exception 2. If there're no datas in the stack. -> Empty string
-        /// Exception 3. If there're only tokens(operators). -> Empty integer
-        /// Exception 4. If tokens are overbalanced.
-        /// Exception 5. If integers are overbalanced.
-        /// </exception>
-        public static int Evaluate(string exp, Lookup variableEvaluator)
-        {
-            // Store integer
-            Stack<int> valueStack = new Stack<int>();
-            // Store operator(tokens)
-            Stack<string> operatorStack = new Stack<string>();
-            int result = 0;
-
-            string[] substrings = Regex.Split(exp, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
-
-            foreach (string s in substrings)
-            {
-                // Check bool if s can change to the integer, and if true, store into the valueStack.
-                if (int.TryParse(s, out int value))
-                    pushToVar(valueStack, operatorStack, value);
-                else if (s.Equals("(") || s.Equals(")") || s.Equals("+") || s.Equals("-") || s.Equals("/") || s.Equals("*"))
-                    pushToOp(valueStack, operatorStack, s);
-                // Exclude white space
-                else if (s.Equals("") || s.Equals(" "))
-                    continue;
-                else
-                {
-                    try
-                    {
-                        bool checkString = s.Any(char.IsDigit);
-                        // Exception 1
-                        // Check if string doesn't include the integer, throw exception
-                        if (!checkString)
-                            throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
-                        else
-                            pushToVar(valueStack, operatorStack, variableEvaluator(s));
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Console.WriteLine(e.Message);
-                        throw;
-                    }
-                }
-            }
-
-            // Exception 2
-            if (valueStack.Count == 0 && operatorStack.Count == 0)
-                throw new ArgumentException("Cannot use empty string.");
-            // Exception 3
-            else if (valueStack.Count == 0 && operatorStack.Count >= 1)
-                throw new ArgumentException("There is no variable.");
-            // Exception 4
-            else if (valueStack.Count == 1 && operatorStack.Count >= 1)
-                throw new ArgumentException("Input too many operators.");
-            // Exception 5
-            else if (valueStack.Count >= 2 + operatorStack.Count)
-                throw new ArgumentException("Operator is not enough.");
-
-            // Check the operatorStack if there's still remain operator(token).
-            // Only + and - are accepted.
-            if (operatorStack.Count() != 0 && countStackValue(valueStack, 2))
-            {
-                if (isOnTop(operatorStack, "+"))
-                    result = addVariable(valueStack.Pop(), valueStack.Pop());
-                else if (isOnTop(operatorStack, "-"))
-                {
-                    result = subtractVariable(valueStack.Pop(), valueStack.Pop());
-                }
-            }
-            else
-                result = valueStack.Pop();
-
-            return result;
-        }
-
         /// <summary>
         /// This method is for push into the variable stack with one conditions. 
         /// </summary>
         /// <param name="varStack"> variable stack </param>
         /// <param name="opStack"> operator stack </param>
         /// <param name="num"> the integer stored into the variable stack </param>
-        private static void pushToVar(Stack<int> varStack, Stack<string> opStack, int num)
+        public static void pushToVar(Stack<int> varStack, Stack<string> opStack, int num)
         {
             varStack.Push(num);
             // Check if there's an operator in the operatorStack
@@ -156,7 +65,7 @@ namespace FormulaEvaluator
         /// Exception 1. If there isn't '(' in the oeprator stack.
         /// Exception 2. If there's too many operators in the operatorStack.
         /// </exception>
-        private static void pushToOp(Stack<int> varStack, Stack<string> opStack, string opr)
+        public static void pushToOp(Stack<int> varStack, Stack<string> opStack, string opr)
         {
             if ((opr.Equals("+") || opr.Equals("-")) && countStackValue(varStack, 2))
             {
@@ -242,7 +151,7 @@ namespace FormulaEvaluator
         /// <returns> If topStack value is equal to the peek value of the operator stack, return true. 
         ///                                                                               else false
         /// </returns>
-        private static bool isOnTop(Stack<string> opStack, string topStack)
+        public static bool isOnTop(Stack<string> opStack, string topStack)
         {
             if (opStack.Peek().Equals(topStack))
                 return true;
@@ -256,7 +165,7 @@ namespace FormulaEvaluator
         /// <returns> If value stack has more than input value, return true
         ///                                                      else false. 
         /// </returns>
-        private static bool countStackValue(Stack<int> valStack, int value)
+        public static bool countStackValue(Stack<int> valStack, int value)
         {
             if (valStack.Count >= value)
                 return true;
@@ -270,7 +179,7 @@ namespace FormulaEvaluator
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num1 + num2 </returns>
-        private static int addVariable(int num1, int num2)
+        public static int addVariable(int num1, int num2)
         {
             return num1 + num2;
         }
@@ -280,7 +189,7 @@ namespace FormulaEvaluator
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num2 - num1 </returns>
-        private static int subtractVariable(int num1, int num2)
+        public static int subtractVariable(int num1, int num2)
         {
             return num2 - num1;
         }
@@ -290,7 +199,7 @@ namespace FormulaEvaluator
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num1 * num2 </returns>
-        private static int multiVariable(int num1, int num2)
+        public static int multiVariable(int num1, int num2)
         {
             return num1 * num2;
         }
@@ -304,7 +213,7 @@ namespace FormulaEvaluator
         /// <exception cref="ArgumentException">
         /// Exception 1. If it trys to divide number by ZERO.
         /// </exception>
-        private static int divideVariable(int num1, int num2)
+        public static int divideVariable(int num1, int num2)
         {
             int result;
             try
@@ -320,6 +229,114 @@ namespace FormulaEvaluator
                 Console.WriteLine(e.Message);
                 throw;
             }
+
+            return result;
+        }
+    }
+}
+
+/**
+ * This namespace is for actual Evaluator.
+ */
+namespace Test3500
+{
+    /// <summary>
+    /// This class includes every class for evaluation.
+    /// It splits input string to store every single data type into each proper type of the stack
+    /// for checking integer or token.
+    /// </summary>
+    public static class Evaluator
+    {
+        /// <summary>
+        /// Delegate for input variable (not integer).
+        /// </summary>
+        /// <param name="v"> First string parameter </param>
+        /// <returns> int value for converting string to int </returns>
+        public delegate int Lookup(string v);
+        /// <summary>
+        /// This method splits string and stores data into the proper stack such as
+        /// if data is an integer, it is stored into the int stack.
+        /// Also it returns result value of the arithmetic expression.
+        /// </summary>
+        /// <param name="exp"> Input string </param>
+        /// <param name="variableEvaluator"> 
+        /// If there's an variable, delegate change it to the integer what user want to input 
+        /// </param>
+        /// <returns> The result of the arithmetic expression </returns>
+        /// <exception cref="ArgumentException">
+        /// There are 5 exceptions. Every exception throws ArgumentException
+        /// Exception 1. If variable doesn't consist of one or more letters followed by the number 
+        /// Exception 2. If there're no datas in the stack. -> Empty string
+        /// Exception 3. If there're only tokens(operators). -> Empty integer
+        /// Exception 4. If tokens are overbalanced.
+        /// Exception 5. If integers are overbalanced.
+        /// </exception>
+        public static int Evaluate(string exp, Lookup variableEvaluator)
+        {
+            // Store integer
+            Stack<int> valueStack = new Stack<int>();
+            // Store operator(tokens)
+            Stack<string> operatorStack = new Stack<string>();
+            int result = 0;
+
+            string[] substrings = Regex.Split(exp, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
+
+            foreach (string s in substrings)
+            {
+                // Check bool if s can change to the integer, and if true, store into the valueStack.
+                if (int.TryParse(s, out int value))
+                    Extensions.pushToVar(valueStack, operatorStack, value);
+                else if (s.Equals("(") || s.Equals(")") || s.Equals("+") || s.Equals("-") || s.Equals("/") || s.Equals("*"))
+                    Extensions.pushToOp(valueStack, operatorStack, s);
+                // Exclude white space
+                else if (s.Equals("") || s.Equals(" "))
+                    continue;
+                else
+                {
+                    try
+                    {
+                        bool checkString = s.Any(char.IsDigit);
+                        // 1
+                        // Check if string doesn't include the integer, throw exception
+                        if (!checkString)
+                            throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
+                        else
+                            Extensions.pushToVar(valueStack, operatorStack, variableEvaluator(s));
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Console.WriteLine(e.Message);
+                        throw;
+                    }
+                }
+            }
+
+            // exception - 2
+            if (valueStack.Count == 0 && operatorStack.Count == 0)
+                throw new ArgumentException("Cannot use empty string.");
+            // 3
+            else if (valueStack.Count == 0 && operatorStack.Count >= 1)
+                throw new ArgumentException("There is no variable.");
+            // 4
+            else if (valueStack.Count == 1 && operatorStack.Count >= 1)
+                throw new ArgumentException("Input too many operators.");
+            // 5
+            else if (valueStack.Count >= 2 + operatorStack.Count)
+                throw new ArgumentException("Operator is not enough.");
+
+            // Check the operatorStack if there's still remain operator(token).
+            // Only + and - are accepted.
+            if (operatorStack.Count() != 0 && Extensions.countStackValue(valueStack, 2))
+            {
+                if (Extensions.isOnTop(operatorStack, "+"))
+                    result = Extensions.addVariable(valueStack.Pop(), valueStack.Pop());
+                else if (Extensions.isOnTop(operatorStack, "-"))
+                {
+                    result = Extensions.subtractVariable(valueStack.Pop(), valueStack.Pop());
+                }
+            }
+            else
+                result = valueStack.Pop();
 
             return result;
         }
