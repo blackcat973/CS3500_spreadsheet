@@ -9,7 +9,12 @@ using System.Threading.Tasks;
  * I made it possible to calculate according to the priority of the tokens(operators).
  *  
  *  @author     SangYoon Cho
- *  @version    1.0 ver
+ *  @date       2022/09/02 (Y/M/D)
+ *  @version    1.1 ver
+ *                  -> Add 3 extension methods (isOnTop, isMoreThanTwo, isMoreThanOne)
+ *                     and modify each if condition to each methods.
+ *                     ex) opStack.Peek().Equals("+") --> isOnTop(opStack, '+")
+ *                  -> Modify public extension methods to private extension methods
  */
 
 namespace FormulaEvaluator
@@ -39,11 +44,11 @@ namespace FormulaEvaluator
         /// <returns> The result of the arithmetic expression </returns>
         /// <exception cref="ArgumentException">
         /// There are 5 exceptions. Every exception throws ArgumentException
-        /// 1. If variable doesn't consist of one or more letters followed by the number 
-        /// 2. If there're no datas in the stack. -> Empty string
-        /// 3. If there're only tokens(operators). -> Empty integer
-        /// 4. If tokens are overbalanced.
-        /// 5. If integers are overbalanced.
+        /// Exception 1. If variable doesn't consist of one or more letters followed by the number 
+        /// Exception 2. If there're no datas in the stack. -> Empty string
+        /// Exception 3. If there're only tokens(operators). -> Empty integer
+        /// Exception 4. If tokens are overbalanced.
+        /// Exception 5. If integers are overbalanced.
         /// </exception>
         public static int Evaluate(string exp, Lookup variableEvaluator)
         {
@@ -70,7 +75,7 @@ namespace FormulaEvaluator
                     try
                     {
                         bool checkString = s.Any(char.IsDigit);
-                        // 1
+                        // Exception 1
                         // Check if string doesn't include the integer, throw exception
                         if (!checkString)
                             throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
@@ -85,29 +90,27 @@ namespace FormulaEvaluator
                 }
             }
 
-            // exception - 2
+            // Exception 2
             if (valueStack.Count == 0 && operatorStack.Count == 0)
                 throw new ArgumentException("Cannot use empty string.");
-            // 3
+            // Exception 3
             else if (valueStack.Count == 0 && operatorStack.Count >= 1)
                 throw new ArgumentException("There is no variable.");
-            // 4
+            // Exception 4
             else if (valueStack.Count == 1 && operatorStack.Count >= 1)
                 throw new ArgumentException("Input too many operators.");
-            // 5
+            // Exception 5
             else if (valueStack.Count >= 2 + operatorStack.Count)
                 throw new ArgumentException("Operator is not enough.");
 
             // Check the operatorStack if there's still remain operator(token).
             // Only + and - are accepted.
-            if (operatorStack.Count() != 0 && valueStack.Count == 2)
+            if (operatorStack.Count() != 0 && isMoreThanTwo(valueStack))
             {
-                if (operatorStack.Peek().Equals("+"))
+                if (isOnTop(operatorStack, "+"))
                     result = addVariable(valueStack.Pop(), valueStack.Pop());
-                else if (operatorStack.Peek().Equals("-"))
-                {
+                else if (isOnTop(operatorStack, "-"))
                     result = subtractVariable(valueStack.Pop(), valueStack.Pop());
-                }
             }
             else
                 result = valueStack.Pop();
@@ -121,7 +124,7 @@ namespace FormulaEvaluator
         /// <param name="varStack"> variable stack </param>
         /// <param name="opStack"> operator stack </param>
         /// <param name="num"> the integer stored into the variable stack </param>
-        public static void pushToVar(Stack<int> varStack, Stack<string> opStack, int num)
+        private static void pushToVar(Stack<int> varStack, Stack<string> opStack, int num)
         {
             varStack.Push(num);
             // Check if there's an operator in the operatorStack
@@ -129,12 +132,12 @@ namespace FormulaEvaluator
             // This is only for multiply or division.
             if (opStack.Count() != 0)
             {
-                if (opStack.Peek().Equals("/") && varStack.Count >= 1)
+                if (isOnTop(opStack, "/") && isMoreThanOne(varStack))
                 {
                     opStack.Pop();
                     varStack.Push(divideVariable(varStack.Pop(), varStack.Pop()));
                 }
-                else if (opStack.Peek().Equals("*") && varStack.Count >= 1)
+                else if (isOnTop(opStack, "*") && isMoreThanOne(varStack))
                 {
                     opStack.Pop();
                     varStack.Push(multiVariable(varStack.Pop(), varStack.Pop()));
@@ -150,23 +153,23 @@ namespace FormulaEvaluator
         /// <param name="opStack"> the operator stack </param>
         /// <param name="opr"> string - the operator stored into the operator stack </param>
         /// <exception cref="ArgumentException">
-        /// 1. If there isn't '(' in the oeprator stack.
-        /// 2. If there's too many operators in the operatorStack.
+        /// Exception 1. If there isn't '(' in the oeprator stack.
+        /// Exception 2. If there's too many operators in the operatorStack.
         /// </exception>
-        public static void pushToOp(Stack<int> varStack, Stack<string> opStack, string opr)
+        private static void pushToOp(Stack<int> varStack, Stack<string> opStack, string opr)
         {
-            if ((opr.Equals("+") || opr.Equals("-")) && varStack.Count >= 2)
+            if ((opr.Equals("+") || opr.Equals("-")) && isMoreThanTwo(varStack))
             {
                 // If + or - is at the top of the operator stack,
                 // pop the value stack twice and the operator stack once,
                 // then apply the popped operator to the popped numbers,
                 // then push the result onto the value stack.
-                if (opStack.Peek().Equals("+"))
+                if (isOnTop(opStack, "+"))
                 {
                     opStack.Pop();
                     pushToVar(varStack, opStack, addVariable(varStack.Pop(), varStack.Pop()));
                 }
-                else if (opStack.Peek().Equals("-"))
+                else if (isOnTop(opStack, "-"))
                 {
                     opStack.Pop();
                     pushToVar(varStack, opStack, subtractVariable(varStack.Pop(), varStack.Pop()));
@@ -177,22 +180,22 @@ namespace FormulaEvaluator
             else if (opr.Equals(")"))
             {
                 // If the value stack contains more than 2 values 
-                if (varStack.Count >= 2)
+                if (isMoreThanTwo(varStack))
                 {
-                    if (opStack.Peek().Equals("+"))
+                    if (isOnTop(opStack, "+"))
                     {
                         opStack.Pop();
                         pushToVar(varStack, opStack, addVariable(varStack.Pop(), varStack.Pop()));
                     }
-                    else if (opStack.Peek().Equals("-"))
+                    else if (isOnTop(opStack, "-"))
                     {
                         opStack.Pop();
                         pushToVar(varStack, opStack, subtractVariable(varStack.Pop(), varStack.Pop()));
 
                     }
-                    // 1
+                    // Exception 1
                     // After evaluating + and -, the top of the operator next to + and - should be a '('.
-                    if (opStack.Count == 0 || !opStack.Peek().Equals("("))
+                    if (opStack.Count == 0 || !isOnTop(opStack, "("))
                         throw new ArgumentException("'(' isn't found where expected.");
                     else
                     {
@@ -201,12 +204,12 @@ namespace FormulaEvaluator
                         // calculate it with two popped numbers.
                         if (opStack.Count != 0)
                         {
-                            if (opStack.Peek().Equals("/") && varStack.Count >= 1)
+                            if (isOnTop(opStack, "/") && isMoreThanOne(varStack))
                             {
                                 opStack.Pop();
                                 pushToVar(varStack, opStack, divideVariable(varStack.Pop(), varStack.Pop()));
                             }
-                            else if (opStack.Peek().Equals("*") && varStack.Count >= 1)
+                            else if (isOnTop(opStack, "*") && isMoreThanOne(varStack))
                             {
                                 opStack.Pop();
                                 pushToVar(varStack, opStack, multiVariable(varStack.Pop(), varStack.Pop()));
@@ -215,14 +218,14 @@ namespace FormulaEvaluator
                     }
                 }
                 // If there's no any operator in the operatorStack or There's no '('.
-                else if (varStack.Count <= 1)
+                else if (!isMoreThanTwo(varStack))
                 {
-                    // 1
-                    if (opStack.Count == 0 || !opStack.Peek().Equals("("))
+                    // Exception 1
+                    if (opStack.Count == 0 || !isOnTop(opStack, "("))
                         throw new ArgumentException("'(' isn't found where expected.");
-                    else if (opStack.Peek().Equals("("))
+                    else if (isOnTop(opStack, "("))
                         opStack.Pop();
-                    // 2
+                    // Exception 2
                     else
                         throw new ArgumentException("You input too many operator.");
                 }
@@ -232,12 +235,56 @@ namespace FormulaEvaluator
         }
 
         /// <summary>
+        /// Extension method for checking peek of operator stack.
+        /// </summary>
+        /// <param name="opStack"> popped string from the operator stack </param>
+        /// <param name="topStack"> the string which is gonna be checking </param>
+        /// <returns> If topStack value is equal to the peek value of the operator stack, return true. 
+        ///                                                                               else false
+        /// </returns>
+        private static bool isOnTop(Stack<string> opStack, string topStack)
+        {
+            if (opStack.Peek().Equals(topStack))
+                return true;
+            else
+                return false;
+        }
+        /// <summary>
+        /// Extension method for checking the count(size) of the value stack.
+        /// </summary>
+        /// <param name="valStack"> Value stack for checking count </param>
+        /// <returns> If value stack has more than two value, return true
+        ///                                                   else false. 
+        /// </returns>
+        private static bool isMoreThanTwo(Stack<int> valStack)
+        {
+            if (valStack.Count >= 2)
+                return true;
+            else
+                return false;
+        }
+        /// <summary>
+        /// Extension method for checking the count(size) of the value stack.
+        /// </summary>
+        /// <param name="valStack"> Value stack for checking count </param>
+        /// <returns> If value stack has more than one value, return true
+        ///                                                   else false. 
+        /// </returns>
+        private static bool isMoreThanOne(Stack<int> valStack)
+        {
+            if (valStack.Count >= 1)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
         /// Add method
         /// </summary>
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num1 + num2 </returns>
-        public static int addVariable(int num1, int num2)
+        private static int addVariable(int num1, int num2)
         {
             return num1 + num2;
         }
@@ -247,7 +294,7 @@ namespace FormulaEvaluator
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num2 - num1 </returns>
-        public static int subtractVariable(int num1, int num2)
+        private static int subtractVariable(int num1, int num2)
         {
             return num2 - num1;
         }
@@ -257,7 +304,7 @@ namespace FormulaEvaluator
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num1 * num2 </returns>
-        public static int multiVariable(int num1, int num2)
+        private static int multiVariable(int num1, int num2)
         {
             return num1 * num2;
         }
@@ -269,9 +316,9 @@ namespace FormulaEvaluator
         /// <param name="num2"> popped number from the variable stack </param>
         /// <returns> result of num2 / num1 </returns>
         /// <exception cref="ArgumentException">
-        /// 1. If it trys to divide number by ZERO.
+        /// Exception 1. If it trys to divide number by ZERO.
         /// </exception>
-        public static int divideVariable(int num1, int num2)
+        private static int divideVariable(int num1, int num2)
         {
             int result;
             try
@@ -279,7 +326,7 @@ namespace FormulaEvaluator
                 if (num1 != 0)
                     result = num2 / num1;
                 else
-                    // 1
+                    // Exception 1
                     throw new ArgumentException("Attempted to divide by zero.");
             }
             catch (ArgumentException e)
