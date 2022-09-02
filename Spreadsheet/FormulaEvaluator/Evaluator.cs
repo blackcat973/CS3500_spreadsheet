@@ -73,7 +73,7 @@ namespace FormulaEvaluator
                     try
                     {
                         bool checkString = s.Any(char.IsDigit);
-                        // 1
+                        // Exception 1
                         // Check if string doesn't include the integer, throw exception
                         if (!checkString)
                             throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
@@ -88,16 +88,16 @@ namespace FormulaEvaluator
                 }
             }
 
-            // exception - 2
+            // Exception 2
             if (valueStack.Count == 0 && operatorStack.Count == 0)
                 throw new ArgumentException("Cannot use empty string.");
-            // 3
+            // Exception 3
             else if (valueStack.Count == 0 && operatorStack.Count >= 1)
                 throw new ArgumentException("There is no variable.");
-            // 4
+            // Exception 4
             else if (valueStack.Count == 1 && operatorStack.Count >= 1)
                 throw new ArgumentException("Input too many operators.");
-            // 5
+            // Exception 5
             else if (valueStack.Count >= 2 + operatorStack.Count)
                 throw new ArgumentException("Operator is not enough.");
 
