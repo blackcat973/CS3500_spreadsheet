@@ -10,11 +10,9 @@ using System.Threading.Tasks;
  *  
  *  @author     SangYoon Cho
  *  @date       2022/09/02 (Y/M/D)
- *  @version    1.1 ver
- *                  -> Add 3 extension methods (isOnTop, isMoreThanTwo, isMoreThanOne)
- *                     and modify each if condition to each methods.
- *                     ex) opStack.Peek().Equals("+") --> isOnTop(opStack, '+")
- *                  -> Modify public extension methods to private extension methods
+ *  @version    1.2 ver
+ *                  -> Merge isMoreThanTwo and isMoreThanOne to countStackValue
+ *                     and modify if condition.
  */
 
 namespace FormulaEvaluator
@@ -75,7 +73,7 @@ namespace FormulaEvaluator
                     try
                     {
                         bool checkString = s.Any(char.IsDigit);
-                        // Exception 1
+                        // 1
                         // Check if string doesn't include the integer, throw exception
                         if (!checkString)
                             throw new ArgumentException("Variable doesn't consist of one or more letters FOLLOWED by one or more digits.");
@@ -90,27 +88,29 @@ namespace FormulaEvaluator
                 }
             }
 
-            // Exception 2
+            // exception - 2
             if (valueStack.Count == 0 && operatorStack.Count == 0)
                 throw new ArgumentException("Cannot use empty string.");
-            // Exception 3
+            // 3
             else if (valueStack.Count == 0 && operatorStack.Count >= 1)
                 throw new ArgumentException("There is no variable.");
-            // Exception 4
+            // 4
             else if (valueStack.Count == 1 && operatorStack.Count >= 1)
                 throw new ArgumentException("Input too many operators.");
-            // Exception 5
+            // 5
             else if (valueStack.Count >= 2 + operatorStack.Count)
                 throw new ArgumentException("Operator is not enough.");
 
             // Check the operatorStack if there's still remain operator(token).
             // Only + and - are accepted.
-            if (operatorStack.Count() != 0 && isMoreThanTwo(valueStack))
+            if (operatorStack.Count() != 0 && countStackValue(valueStack, 2))
             {
                 if (isOnTop(operatorStack, "+"))
                     result = addVariable(valueStack.Pop(), valueStack.Pop());
                 else if (isOnTop(operatorStack, "-"))
+                {
                     result = subtractVariable(valueStack.Pop(), valueStack.Pop());
+                }
             }
             else
                 result = valueStack.Pop();
@@ -132,12 +132,12 @@ namespace FormulaEvaluator
             // This is only for multiply or division.
             if (opStack.Count() != 0)
             {
-                if (isOnTop(opStack, "/") && isMoreThanOne(varStack))
+                if (isOnTop(opStack, "/") && countStackValue(varStack, 1))
                 {
                     opStack.Pop();
                     varStack.Push(divideVariable(varStack.Pop(), varStack.Pop()));
                 }
-                else if (isOnTop(opStack, "*") && isMoreThanOne(varStack))
+                else if (isOnTop(opStack, "*") && countStackValue(varStack, 1))
                 {
                     opStack.Pop();
                     varStack.Push(multiVariable(varStack.Pop(), varStack.Pop()));
@@ -158,7 +158,7 @@ namespace FormulaEvaluator
         /// </exception>
         private static void pushToOp(Stack<int> varStack, Stack<string> opStack, string opr)
         {
-            if ((opr.Equals("+") || opr.Equals("-")) && isMoreThanTwo(varStack))
+            if ((opr.Equals("+") || opr.Equals("-")) && countStackValue(varStack, 2))
             {
                 // If + or - is at the top of the operator stack,
                 // pop the value stack twice and the operator stack once,
@@ -180,7 +180,7 @@ namespace FormulaEvaluator
             else if (opr.Equals(")"))
             {
                 // If the value stack contains more than 2 values 
-                if (isMoreThanTwo(varStack))
+                if (countStackValue(varStack, 2))
                 {
                     if (isOnTop(opStack, "+"))
                     {
@@ -204,12 +204,12 @@ namespace FormulaEvaluator
                         // calculate it with two popped numbers.
                         if (opStack.Count != 0)
                         {
-                            if (isOnTop(opStack, "/") && isMoreThanOne(varStack))
+                            if (isOnTop(opStack, "/") && countStackValue(varStack, 1))
                             {
                                 opStack.Pop();
                                 pushToVar(varStack, opStack, divideVariable(varStack.Pop(), varStack.Pop()));
                             }
-                            else if (isOnTop(opStack, "*") && isMoreThanOne(varStack))
+                            else if (isOnTop(opStack, "*") && countStackValue(varStack, 1))
                             {
                                 opStack.Pop();
                                 pushToVar(varStack, opStack, multiVariable(varStack.Pop(), varStack.Pop()));
@@ -218,7 +218,7 @@ namespace FormulaEvaluator
                     }
                 }
                 // If there's no any operator in the operatorStack or There's no '('.
-                else if (!isMoreThanTwo(varStack))
+                else if (!countStackValue(varStack, 2))
                 {
                     // Exception 1
                     if (opStack.Count == 0 || !isOnTop(opStack, "("))
@@ -253,26 +253,12 @@ namespace FormulaEvaluator
         /// Extension method for checking the count(size) of the value stack.
         /// </summary>
         /// <param name="valStack"> Value stack for checking count </param>
-        /// <returns> If value stack has more than two value, return true
-        ///                                                   else false. 
+        /// <returns> If value stack has more than input value, return true
+        ///                                                      else false. 
         /// </returns>
-        private static bool isMoreThanTwo(Stack<int> valStack)
+        private static bool countStackValue(Stack<int> valStack, int value)
         {
-            if (valStack.Count >= 2)
-                return true;
-            else
-                return false;
-        }
-        /// <summary>
-        /// Extension method for checking the count(size) of the value stack.
-        /// </summary>
-        /// <param name="valStack"> Value stack for checking count </param>
-        /// <returns> If value stack has more than one value, return true
-        ///                                                   else false. 
-        /// </returns>
-        private static bool isMoreThanOne(Stack<int> valStack)
-        {
-            if (valStack.Count >= 1)
+            if (valStack.Count >= value)
                 return true;
             else
                 return false;
