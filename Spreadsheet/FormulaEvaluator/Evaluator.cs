@@ -9,6 +9,7 @@ using System.Threading.Tasks;
  * I made it possible to calculate according to the priority of the tokens(operators).
  *  
  *  @author     SangYoon Cho
+ *  @version    1.0 ver
  */
 
 namespace FormulaEvaluator
