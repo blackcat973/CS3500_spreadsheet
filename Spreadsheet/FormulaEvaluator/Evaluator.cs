@@ -11,9 +11,9 @@ using System.Threading.Tasks;
  *  
  *  @author     SangYoon Cho
  *  @date       2022/09/02 (Y/M/D)
- *  @version    1.3 ver
- *                  -> Misunderstood about Extension methods concept.
- *                  -> Modified the code with using Extension methods.
+ *  @version    1.4 ver
+ *                  -> Modify calculator method 
+ *                  -> Combine 4 operator methods in one method
  */
 
 
