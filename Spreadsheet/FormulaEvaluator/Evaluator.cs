@@ -42,12 +42,12 @@ namespace EvaExtentions
                 if (isOnTop(opStack, "/") && countStackValue(varStack, 1))
                 {
                     opStack.Pop();
-                    varStack.Push(divideVariable(varStack.Pop(), varStack.Pop()));
+                    varStack.Push(calculateVariable("/", varStack.Pop(), varStack.Pop()));
                 }
                 else if (isOnTop(opStack, "*") && countStackValue(varStack, 1))
                 {
                     opStack.Pop();
-                    varStack.Push(multiVariable(varStack.Pop(), varStack.Pop()));
+                    varStack.Push(calculateVariable("*", varStack.Pop(), varStack.Pop()));
                 }
             }
         }
@@ -74,12 +74,12 @@ namespace EvaExtentions
                 if (isOnTop(opStack, "+"))
                 {
                     opStack.Pop();
-                    pushToVar(varStack, opStack, addVariable(varStack.Pop(), varStack.Pop()));
+                    pushToVar(varStack, opStack, calculateVariable("+", varStack.Pop(), varStack.Pop()));
                 }
                 else if (isOnTop(opStack, "-"))
                 {
                     opStack.Pop();
-                    pushToVar(varStack, opStack, subtractVariable(varStack.Pop(), varStack.Pop()));
+                    pushToVar(varStack, opStack, calculateVariable("-", varStack.Pop(), varStack.Pop()));
                 }
                 opStack.Push(opr);
             }
@@ -92,12 +92,12 @@ namespace EvaExtentions
                     if (isOnTop(opStack, "+"))
                     {
                         opStack.Pop();
-                        pushToVar(varStack, opStack, addVariable(varStack.Pop(), varStack.Pop()));
+                        pushToVar(varStack, opStack, calculateVariable("+", varStack.Pop(), varStack.Pop()));
                     }
                     else if (isOnTop(opStack, "-"))
                     {
                         opStack.Pop();
-                        pushToVar(varStack, opStack, subtractVariable(varStack.Pop(), varStack.Pop()));
+                        pushToVar(varStack, opStack, calculateVariable("-", varStack.Pop(), varStack.Pop()));
 
                     }
                     // Exception 1
@@ -114,12 +114,12 @@ namespace EvaExtentions
                             if (isOnTop(opStack, "/") && countStackValue(varStack, 1))
                             {
                                 opStack.Pop();
-                                pushToVar(varStack, opStack, divideVariable(varStack.Pop(), varStack.Pop()));
+                                pushToVar(varStack, opStack, calculateVariable("/", varStack.Pop(), varStack.Pop()));
                             }
                             else if (isOnTop(opStack, "*") && countStackValue(varStack, 1))
                             {
                                 opStack.Pop();
-                                pushToVar(varStack, opStack, multiVariable(varStack.Pop(), varStack.Pop()));
+                                pushToVar(varStack, opStack, calculateVariable("*", varStack.Pop(), varStack.Pop()));
                             }
                         }
                     }
@@ -172,63 +172,42 @@ namespace EvaExtentions
         }
 
         /// <summary>
-        /// Add method
+        /// Calculator method. This method takes the operator and calculate for each operator.
         /// </summary>
         /// <param name="num1"> popped number from the variable stack </param>
         /// <param name="num2"> popped number from the variable stack </param>
-        /// <returns> result of num1 + num2 </returns>
-        public static int addVariable(int num1, int num2)
-        {
-            return num1 + num2;
-        }
-        /// <summary>
-        /// Subtract method
-        /// </summary>
-        /// <param name="num1"> popped number from the variable stack </param>
-        /// <param name="num2"> popped number from the variable stack </param>
-        /// <returns> result of num2 - num1 </returns>
-        public static int subtractVariable(int num1, int num2)
-        {
-            return num2 - num1;
-        }
-        /// <summary>
-        /// Multiply method
-        /// </summary>
-        /// <param name="num1"> popped number from the variable stack </param>
-        /// <param name="num2"> popped number from the variable stack </param>
-        /// <returns> result of num1 * num2 </returns>
-        public static int multiVariable(int num1, int num2)
-        {
-            return num1 * num2;
-        }
-
-        /// <summary>
-        /// Division method
-        /// </summary>
-        /// <param name="num1"> popped number from the variable stack </param>
-        /// <param name="num2"> popped number from the variable stack </param>
-        /// <returns> result of num2 / num1 </returns>
+        /// <returns> result of num1 (operator) num2 </returns>
         /// <exception cref="ArgumentException">
         /// Exception 1. If it trys to divide number by ZERO.
         /// </exception>
-        public static int divideVariable(int num1, int num2)
+        public static int calculateVariable(string opr, int num1, int num2)
         {
-            int result;
-            try
+            if (opr.Equals("+"))
+                return num1 + num2;
+            else if (opr.Equals("-"))
+                return num2 - num1;
+            else if (opr.Equals("*"))
+                return num1 * num2;
+            else if (opr.Equals("/"))
             {
-                if (num1 != 0)
-                    result = num2 / num1;
-                else
-                    // Exception 1
-                    throw new ArgumentException("Attempted to divide by zero.");
+                int result = 0;
+                try
+                {
+                    if (num1 != 0)
+                        result = num2 / num1;
+                    else
+                        // Exception 1
+                        throw new ArgumentException("Attempted to divide by zero.");
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                    throw;
+                }
+                return result;
             }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine(e.Message);
-                throw;
-            }
-
-            return result;
+            else
+                throw new ArgumentException("Wrong operator is used.");
         }
     }
 }
@@ -327,10 +306,10 @@ namespace FormulaEvaluator
             if (operatorStack.Count() != 0 && Extensions.countStackValue(valueStack, 2))
             {
                 if (Extensions.isOnTop(operatorStack, "+"))
-                    result = Extensions.addVariable(valueStack.Pop(), valueStack.Pop());
+                    result = Extensions.calculateVariable("+", valueStack.Pop(), valueStack.Pop());
                 else if (Extensions.isOnTop(operatorStack, "-"))
                 {
-                    result = Extensions.subtractVariable(valueStack.Pop(), valueStack.Pop());
+                    result = Extensions.calculateVariable("-", valueStack.Pop(), valueStack.Pop());
                 }
             }
             else
