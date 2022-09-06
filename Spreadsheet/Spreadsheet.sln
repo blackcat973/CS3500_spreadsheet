@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaEvaluator", "FormulaEvaluator\FormulaEvaluator.csproj", "{BD22DFBE-F969-499B-9EAE-19701F2F5909}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaEvaluator", "FormulaEvaluator\FormulaEvaluator.csproj", "{BD22DFBE-F969-499B-9EAE-19701F2F5909}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyGraph", "DependencyGraph\DependencyGraph.csproj", "{7D763B5E-6A65-404B-A121-A7847B84FA49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyGraphTests", "DependencyGraphTests\DependencyGraphTests.csproj", "{642EEC70-E3C1-4060-9A59-FC202E67A5D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{BD22DFBE-F969-499B-9EAE-19701F2F5909}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD22DFBE-F969-499B-9EAE-19701F2F5909}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD22DFBE-F969-499B-9EAE-19701F2F5909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D763B5E-6A65-404B-A121-A7847B84FA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D763B5E-6A65-404B-A121-A7847B84FA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D763B5E-6A65-404B-A121-A7847B84FA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D763B5E-6A65-404B-A121-A7847B84FA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642EEC70-E3C1-4060-9A59-FC202E67A5D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642EEC70-E3C1-4060-9A59-FC202E67A5D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642EEC70-E3C1-4060-9A59-FC202E67A5D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642EEC70-E3C1-4060-9A59-FC202E67A5D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
