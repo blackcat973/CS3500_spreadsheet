@@ -14,6 +14,8 @@ using System.Threading.Tasks;
  *  @version    1.4 ver
  *                  -> Modify calculator method 
  *                  -> Combine 4 operator methods in one method
+ *              1.5 ver
+ *                  -> Add null argumentexception.
  */
 
 
@@ -250,6 +252,9 @@ namespace FormulaEvaluator
         /// </exception>
         public static int Evaluate(string exp, Lookup variableEvaluator)
         {
+            if (exp == null)
+                throw new ArgumentException("Cannot input null value.");
+
             // Store integer
             Stack<int> valueStack = new Stack<int>();
             // Store operator(tokens)
