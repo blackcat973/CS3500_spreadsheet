@@ -10,7 +10,8 @@
 //               (Just return 'nothing' if any changes are not happened.)
 // Version 1.4 - SangYoon Cho
 // 2022/09/09    (Add a comment and test code.)
-//
+// Version 1.4 - SangYoon Cho
+// 2022/09/09    (Add private in front of the Dictionary variables.)
 
 using System;
 using System.Collections;
@@ -52,8 +53,8 @@ namespace SpreadsheetUtilities
     public class DependencyGraph
     {
         private int sizeofDG;
-        Dictionary<string, List<string>> Dependents;
-        Dictionary<string, List<string>> Dependees;
+        private Dictionary<string, List<string>> Dependents;
+        private Dictionary<string, List<string>> Dependees;
 
         /// <summary>
         /// Creates an empty DependencyGraph.
