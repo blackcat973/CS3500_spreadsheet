@@ -8,6 +8,9 @@
 //               (Make a two Dictionary stored Dependents and Dependees values for each pairs of the string.)
 //               (No throw exceptioni in this code.)
 //               (Just return 'nothing' if any changes are not happened.)
+// Version 1.4 - SangYoon Cho
+// 2022/09/09    (Add a comment and test code.)
+//
 
 using System;
 using System.Collections;
@@ -54,6 +57,7 @@ namespace SpreadsheetUtilities
 
         /// <summary>
         /// Creates an empty DependencyGraph.
+        /// Initialize size of DependencyGraph and Dictionary of Dependents and Dependees.
         /// </summary>
         public DependencyGraph()
         {
@@ -77,7 +81,8 @@ namespace SpreadsheetUtilities
         /// This property is an example of an indexer.  If dg is a DependencyGraph, you would
         /// invoke it like this:
         /// dg["a"]
-        /// It should return the size of dependees("a")
+        /// It should return the size of dependees("a").
+        /// If dependees don't have "s" key, it returns 0.
         /// </summary>
         public int this[string s]
         {
@@ -87,6 +92,10 @@ namespace SpreadsheetUtilities
         /// <summary>
         /// Reports whether dependents(s) is non-empty.
         /// </summary>
+        /// <param name="s"> The key string of Dependents. </param>
+        /// <returns> If dependents has 's' key, return true
+        ///                                      else false.
+        /// </returns>
         public bool HasDependents(string s)
         {
             if (!Dependents.ContainsKey(s))
@@ -104,6 +113,10 @@ namespace SpreadsheetUtilities
         /// <summary>
         /// Reports whether dependees(s) is non-empty.
         /// </summary>
+        /// <param name="s"> The key string of dependees. </param>
+        /// <returns> If dependees has 's' key and it is not empty, return true
+        ///                                                         else false.
+        /// </returns>
         public bool HasDependees(string s)
         {
             if (!Dependees.ContainsKey(s))
@@ -121,6 +134,10 @@ namespace SpreadsheetUtilities
         /// <summary>
         /// Enumerates dependents(s).
         /// </summary>
+        /// <param name="s"> The key string of dependents </param>
+        /// <returns> If dependents has 's' key, return dependents(s)
+        ///                                      else return empty List(Enumerator)
+        /// </returns>
         public IEnumerable<string> GetDependents(string s)
         {
             if (!Dependents.ContainsKey(s))
@@ -129,8 +146,12 @@ namespace SpreadsheetUtilities
         }
 
         /// <summary>
-        /// Enumerates dependees(s).
+        /// Enumerates dependents(s).
         /// </summary>
+        /// <param name="s"> The key string of dependents </param>
+        /// <returns> If dependents has 's' key, return dependents(s)
+        ///                                      else return empty List(Enumerator)
+        /// </returns>
         public IEnumerable<string> GetDependees(string s)
         {
             if (!Dependees.ContainsKey(s))
@@ -154,15 +175,17 @@ namespace SpreadsheetUtilities
             List<string> inDepents = new List<string>();
             List<string> inDees = new List<string>();
 
+            // If s,t already exist in the dependents
             if (Dependents.ContainsKey(s) && Dependents[s].Contains(t))
             {
                 return;
             }
             else
             {
-                // if Depedents[s] doesn't contain 't'
+                // if Depedents contain 's'
                 if (Dependents.ContainsKey(s))
                 {
+                    // if dependees contain 't'
                     if (Dependees.ContainsKey(t))
                     {
                         Dependents[s].Add(t);
@@ -179,6 +202,7 @@ namespace SpreadsheetUtilities
                 // if Dependents doesn't contain 's' key.
                 else
                 {
+                    // if dependees contain 't'
                     if (Dependees.ContainsKey(t))
                     {
                         inDepents.Add(t);
@@ -202,29 +226,14 @@ namespace SpreadsheetUtilities
 
         /// <summary>
         /// Removes the ordered pair (s,t), if it exists
+        /// If dependents or dependees is empty, it removes nothing.
         /// </summary>
-        /// <param name="s"></param>
-        /// <param name="t"></param>
+        /// <param name="s"> s must be evaluated first. T depends on S </param>
+        /// <param name="t"> t cannot be evaluated until s is </param>
         public void RemoveDependency(string s, string t)
         {
             if (Dependents.ContainsKey(s) && Dependents[s].Contains(t))
             {
-                //if (Dependents[s].Count == 1)
-                //{
-                //    Dependents.Remove(s);
-                //    if (Dependees[t].Count <= 1)
-                //        Dependees.Remove(t);
-                //    else
-                //        Dependees[t].Remove(s);
-                //}
-                //else
-                //{
-                //    Dependents[s].Remove(t);
-                //    if (Dependees[t].Count <= 1)
-                //        Dependees.Remove(t);
-                //    else
-                //        Dependees[t].Remove(s);
-                //}
                 Dependents[s].Remove(t);
                 Dependees[t].Remove(s);
                 sizeofDG--;
@@ -240,9 +249,11 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            // if dependents doesn't contain 's'
             if (!Dependents.ContainsKey(s))
             {
                 if (newDependents.Count() == 0)
+                    // make an empty enumerate dependees.
                     Dependents.Add(s, new List<string>());
                 else
                     foreach (string dents in newDependents)
@@ -264,8 +275,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
+            // if dependents doesn't contain 's'
             if (!Dependees.ContainsKey(s))
             {
+                // make an empty enumerate dependents.
                 if (newDependees.Count() == 0)
                     Dependees.Add(s, new List<string>());
                 else
