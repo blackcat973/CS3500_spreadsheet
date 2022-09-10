@@ -8,10 +8,17 @@
 //               (Make a two Dictionary stored Dependents and Dependees values for each pairs of the string.)
 //               (No throw exceptioni in this code.)
 //               (Just return 'nothing' if any changes are not happened.)
-// Version 1.4 - SangYoon Cho
+// Version 1.4
 // 2022/09/09    (Add a comment and test code.)
-// Version 1.4 - SangYoon Cho
-// 2022/09/09    (Add private in front of the Dictionary variables.)
+//               (Add private in front of the Dictionary variables.)
+// Version 1.5
+// 2022/09/09    (After getting advice that HashSet is better than List in this assignment, Change list to the HashSet)
+//               (And Modify every code to fit the HashSet.)
+//               (Such as - Count: For the counting the size, remove the empty key so that it can return the correct size.)
+//               (          AddDependencyGraph: HashSet doesn't accept duplicate value, it doesn't have to split the condition)
+//               (                              However, size variable is needed to be handled first before adding the pair in the Dictionary.)
+//               (          RemoveDG: Also size variable is needed to be handled at the first before removing the pair in the Dictionary.)
+//               (                    Remove the empty set for size variable.)
 
 using System;
 using System.Collections;
@@ -53,8 +60,8 @@ namespace SpreadsheetUtilities
     public class DependencyGraph
     {
         private int sizeofDG;
-        private Dictionary<string, List<string>> Dependents;
-        private Dictionary<string, List<string>> Dependees;
+        private Dictionary<string, HashSet<string>> Dependents;
+        private Dictionary<string, HashSet<string>> Dependees;
 
         /// <summary>
         /// Creates an empty DependencyGraph.
@@ -63,8 +70,8 @@ namespace SpreadsheetUtilities
         public DependencyGraph()
         {
             sizeofDG = 0;
-            Dependents = new Dictionary<string, List<string>>();
-            Dependees = new Dictionary<string, List<string>>();
+            Dependents = new Dictionary<string, HashSet<string>>();
+            Dependees = new Dictionary<string, HashSet<string>>();
         }
 
 
@@ -142,7 +149,7 @@ namespace SpreadsheetUtilities
         public IEnumerable<string> GetDependents(string s)
         {
             if (!Dependents.ContainsKey(s))
-                return new List<string>();
+                return new HashSet<string>();
             return Dependents[s];
         }
 
@@ -156,7 +163,7 @@ namespace SpreadsheetUtilities
         public IEnumerable<string> GetDependees(string s)
         {
             if (!Dependees.ContainsKey(s))
-                return new List<string>();
+                return new HashSet<string>();
             return Dependees[s];
         }
 
@@ -173,74 +180,49 @@ namespace SpreadsheetUtilities
         /// <param name="t"> t cannot be evaluated until s is</param>        /// 
         public void AddDependency(string s, string t)
         {
-            List<string> inDepents = new List<string>();
-            List<string> inDees = new List<string>();
-
-            // If s,t already exist in the dependents
-            if (Dependents.ContainsKey(s) && Dependents[s].Contains(t))
-            {
-                return;
-            }
-            else
-            {
-                // if Depedents contain 's'
-                if (Dependents.ContainsKey(s))
-                {
-                    // if dependees contain 't'
-                    if (Dependees.ContainsKey(t))
-                    {
-                        Dependents[s].Add(t);
-                        Dependees[t].Add(s);
-                    }
-                    else
-                    {
-                        inDees.Add(s);
-                        Dependees.Add(t, inDees);
-
-                        Dependents[s].Add(t);
-                    }
-                }
-                // if Dependents doesn't contain 's' key.
-                else
-                {
-                    // if dependees contain 't'
-                    if (Dependees.ContainsKey(t))
-                    {
-                        inDepents.Add(t);
-                        Dependents.Add(s, inDepents);
-
-                        Dependees[t].Add(s);
-                    }
-                    else
-                    {
-                        inDepents.Add(t);
-                        inDees.Add(s);
-
-                        Dependents.Add(s, inDepents);
-                        Dependees.Add(t, inDees);
-                    }
-                }
+            if (!Dependents.ContainsKey(s) || !Dependees.ContainsKey(t))
                 sizeofDG++;
-            }
+
+            // Check Dependents.
+            if (Dependents.ContainsKey(s))
+                Dependents[s].Add(t);
+            else
+                Dependents.Add(s, new HashSet<string> { t });
+
+            // Check Dependees.
+            if (Dependees.ContainsKey(t))
+                Dependees[t].Add(s);
+            else
+                Dependees.Add(t, new HashSet<string> { s });
         }
 
 
         /// <summary>
         /// Removes the ordered pair (s,t), if it exists
-        /// If dependents or dependees is empty, it removes nothing.
+        /// If dependents or dependees is empty, it removes empty key.
         /// </summary>
         /// <param name="s"> s must be evaluated first. T depends on S </param>
         /// <param name="t"> t cannot be evaluated until s is </param>
         public void RemoveDependency(string s, string t)
         {
             if (Dependents.ContainsKey(s) && Dependents[s].Contains(t))
+                sizeofDG--;
+
+            if (Dependents.ContainsKey(s))
             {
                 Dependents[s].Remove(t);
-                Dependees[t].Remove(s);
-                sizeofDG--;
+                if (Dependents[s].Count == 0)
+                    // Remove empty key
+                    Dependents.Remove(s);
             }
-            else
-                return;
+
+            if (Dependees.ContainsKey(t))
+            {
+                Dependees[t].Remove(s);
+                if (Dependees[t].Count == 0)
+                    // Remove empty key
+                    Dependees.Remove(t);
+            }
         }
 
 
@@ -255,7 +237,7 @@ namespace SpreadsheetUtilities
             {
                 if (newDependents.Count() == 0)
                     // make an empty enumerate dependees.
-                    Dependents.Add(s, new List<string>());
+                    Dependents.Add(s, new HashSet<string>());
                 else
                     foreach (string dents in newDependents)
                         AddDependency(s, dents);
@@ -281,7 +263,7 @@ namespace SpreadsheetUtilities
             {
                 // make an empty enumerate dependents.
                 if (newDependees.Count() == 0)
-                    Dependees.Add(s, new List<string>());
+                    Dependees.Add(s, new HashSet<string>());
                 else
                     foreach (string dees in newDependees)
                         AddDependency(dees, s);
