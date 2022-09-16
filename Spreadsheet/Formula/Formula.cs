@@ -3,7 +3,7 @@
 // do anything else!
 
 // Change log:
-// Last updated: 9/8, updated for non-nullable types
+// Last updated: 9/16, updated for non-nullable types
 /** @author     SangYoon Cho
  *  @date       2022/09/02 (Y/M/D)
  *  @version    1.1 ver
