@@ -14,6 +14,7 @@ namespace FormulaTests
 
         // ########################### TEST SINGLE VARIABLE AND NUM ###########################  
 
+        // Test Constructor
         [TestMethod]
         [TestCategory("1")]
         [ExpectedException(typeof(FormulaFormatException))]
@@ -75,6 +76,7 @@ namespace FormulaTests
             Formula f = new Formula("+");
         }
 
+        // Test Equals, ==, and !=
         [TestMethod]
         [TestCategory("4")]
         public void TestCompareSingleVar1()
@@ -139,6 +141,7 @@ namespace FormulaTests
 
         // ########################### TEST SINGLE FORMULA ###########################  
 
+        // Test Constructor
         [TestMethod]
         [TestCategory("5")]
         [ExpectedException(typeof(FormulaFormatException))]
@@ -199,6 +202,7 @@ namespace FormulaTests
             Formula f = new Formula("1+x1", s => s.ToUpper(), s => (s == "y1"));
         }
 
+        // Test Evaluate
         [TestMethod]
         [TestCategory("5")]
         public void TestOneFormula8()
@@ -224,6 +228,7 @@ namespace FormulaTests
             Formula f = new Formula("1 x", s => s.ToUpper(), s => false);
         }
 
+        // Test Equals, GetVariable, == and !=
         [TestMethod]
         [TestCategory("6")]
         public void TestOneFormula_GetVariable()
@@ -254,6 +259,7 @@ namespace FormulaTests
             Assert.IsTrue(f1.GetHashCode().Equals(f2.GetHashCode()));
         }
 
+        // Test Catch Error
         [TestMethod]
         [TestCategory("8")]
         public void TestOneFormula_Div0()
@@ -309,6 +315,7 @@ namespace FormulaTests
 
         // ########################### TEST MULTIPLE FORMULA ###########################  
 
+        //Test Constructor
         [TestMethod]
         [TestCategory("9")]
         public void TestMultiFormula()
@@ -327,6 +334,7 @@ namespace FormulaTests
             Assert.AreEqual("1+X-Y*Z", f.ToString());
         }
 
+        // Test Evaluate
         [TestMethod]
         [TestCategory("9")]
         public void TestMultiFormula3()
@@ -345,6 +353,7 @@ namespace FormulaTests
             Assert.AreEqual(100.0, f.Evaluate(s => (s == "Y" ? 1 : 2)));
         }
 
+        // Test GetVar, Equals, == and !=
         [TestMethod]
         [TestCategory("9")]
         public void TestMultiFormula_GetVar()
@@ -385,6 +394,7 @@ namespace FormulaTests
             Assert.AreEqual(4.0, f.Evaluate(s => (s == "x" ? 5 : 2)));
         }
 
+        // Test Catch Error
         [TestMethod]
         [TestCategory("10")]
         public void TestMultiFormula_Div0()
@@ -394,6 +404,7 @@ namespace FormulaTests
             Assert.IsInstanceOfType(f.Evaluate(s => (s == "x" ? 4 : 2)), typeof(FormulaError));
         }
 
+        // Test Complicated Evaluate
         [TestMethod]
         [TestCategory("11")]
         public void TestMultiFormulaDuplicate()
@@ -492,6 +503,7 @@ namespace FormulaTests
             Assert.AreEqual(2.0, f.Evaluate(s => (s == "x" ? 4 : 2)));
         }
 
+        // FROM Equals
         [TestMethod]
         [TestCategory("21")]
         public void TestEquals_Null()
