@@ -3,9 +3,9 @@
 // do anything else!
 
 // Change log:
-// Last updated: 9/16, updated for non-nullable types
+// Last updated: 9/16
 /** @author     SangYoon Cho
- *  @date       2022/09/02 (Y/M/D)
+ *  @date       2022/09/16 (Y/M/D)
  *  @version    1.1 ver
  *                  -> Fill in each methods with copying Evaluator.cs 
  */
