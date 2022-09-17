@@ -302,7 +302,7 @@ namespace SpreadsheetUtilities
                             }
                         }
                     }
-                    catch
+                    catch (ArgumentException e)
                     {
                         return new FormulaError("Name is undefined.");
                     }
