@@ -8,6 +8,8 @@
  *  @date       2022/09/16 (Y/M/D)
  *  @version    1.1 ver
  *                  -> Fill in each methods with copying Evaluator.cs 
+ *              1.2 ver
+ *                  -> Add ArgumentException in the catch condition.
  */
 
 using System;
