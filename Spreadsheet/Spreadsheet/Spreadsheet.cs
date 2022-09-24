@@ -35,7 +35,7 @@ namespace SS
         private class Cell
         {
             object cellContent;
-            object cellValue; // This would be used later
+            //object cellValue; // This would be used later
 
             public Cell()
             {
