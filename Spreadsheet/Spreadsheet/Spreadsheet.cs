@@ -6,6 +6,8 @@
  *  @version    1.1 ver
  *                  -> Fill in each methods with copying Spreadsheet.cs and AbstractSpreadsheet.cs 
  *                     and creates tests cs file.
+ *              1.2 ver
+ *                  -> Line 86: Change == to 'is not'
  */
 
 using System;
@@ -81,7 +83,7 @@ namespace SS
             foreach (string name in spreadSheetCell.Keys)
             {
                 // Define empty cell that has only ""
-                if (spreadSheetCell[name].CellValue != "")
+                if (spreadSheetCell[name].CellValue is not "")
                     allNonEmptyCell.Add(name);
             }
 
