@@ -182,7 +182,7 @@ namespace SS
             try
             {
                 // Load file text from JSON, and initialize it into the Spreadsheet object
-                Spreadsheet s = JsonConvert.DeserializeObject<Spreadsheet>(File.ReadAllText(filename));
+                Spreadsheet? s = JsonConvert.DeserializeObject<Spreadsheet>(File.ReadAllText(filename));
 
                 if (!s.Version.Equals(this.Version))
                 {
