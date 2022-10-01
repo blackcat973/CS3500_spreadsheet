@@ -316,7 +316,7 @@ namespace SS
             // program needs to do calculate according to the order of connection
             foreach (string str in allDept)
             {
-                if (spreadSheetCell.TryGetValue(str, out Cell cellV))   // until cellV is Formula
+                if (spreadSheetCell.TryGetValue(str, out Cell? cellV))   // until cellV is Formula
                     if (cellV.CellType.Equals("SpreadsheetUtilities.Formula"))  // Only formula need to be calculated
                         cellV.calculateFormula(myLookUp);
             }
