@@ -183,20 +183,22 @@ namespace SS
             {
                 // Load file text from JSON, and initialize it into the Spreadsheet object
                 Spreadsheet? s = JsonConvert.DeserializeObject<Spreadsheet>(File.ReadAllText(filename));
-
-                if (!s.Version.Equals(this.Version))
+                if (s != null)
                 {
-                    // catch different version
-                    throw new SpreadsheetReadWriteException("Cannot load different version of the file.");
-                }
-                else
-                {
-                    // you need to store value appropriately again for setting DG graph and Cell value.
-                    foreach (string str in s.spreadSheetCell.Keys)
+                    if (!this.Version.Equals(s.Version))
                     {
-                        string contentFromFile = s.spreadSheetCell[str].ContentString;
-                        // contentstring 형태변환
-                        SetContentsOfCell(str, contentFromFile);
+                        // catch different version
+                        throw new SpreadsheetReadWriteException("Cannot load different version of the file.");
+                    }
+                    else
+                    {
+                        // you need to store value appropriately again for setting DG graph and Cell value.
+                        foreach (string str in s.spreadSheetCell.Keys)
+                        {
+                            string contentFromFile = s.spreadSheetCell[str].ContentString;
+                            // contentstring 형태변환
+                            SetContentsOfCell(str, contentFromFile);
+                        }
                     }
                 }
             }
