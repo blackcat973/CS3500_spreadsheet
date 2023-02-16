@@ -54,13 +54,11 @@ namespace SS
             public string contentString;    // store stringForm
             public object cellContent;      // store input content
             public object cellValue;        // store evaluated value
-            public string getType;          // store type of the variable
 
             public Cell()
             {
                 this.cellContent = "";
                 this.cellValue = "";   // Would be used later
-                this.getType = "string";
                 this.contentString = "";
             }
             // Double constructor
@@ -68,7 +66,6 @@ namespace SS
             {
                 this.cellContent = d;
                 this.cellValue = d;    // Would be used later
-                this.getType = d.GetType().ToString();
                 this.contentString = d.ToString();
             }
             // String constructor
@@ -76,7 +73,6 @@ namespace SS
             {
                 this.cellContent = s;
                 this.cellValue = s;    // Would be used later
-                this.getType = s.GetType().ToString();
                 this.contentString = s.ToString();
             }
             // Formula constructor
@@ -84,7 +80,6 @@ namespace SS
             {
                 this.cellContent = obj;
                 this.cellValue = obj.Evaluate(lookup);
-                this.getType = obj.GetType().ToString();
                 this.contentString = "=" + obj.ToString();
             }
 
@@ -101,12 +96,6 @@ namespace SS
                 set { cellValue = value; }
             }
 
-            public object CellType
-            {
-                get { return getType; }
-                set { getType = value.GetType().ToString(); }
-            }
-
             public string ContentString
             {
                 get { return contentString; }
@@ -119,7 +108,7 @@ namespace SS
             /// <param name="lookup"> delegate function for converting string to double. </param>
             public void calculateFormula(Func<string, double> lookup)
             {
-                if (getType.Equals("SpreadsheetUtilities.Formula"))
+                if (cellContent.GetType() == typeof(Formula))
                 {
                     Formula formula = (Formula)cellContent;
                     this.cellValue = formula.Evaluate(lookup);
@@ -317,7 +306,7 @@ namespace SS
             foreach (string str in allDept)
             {
                 if (spreadSheetCell.TryGetValue(str, out Cell? cellV))   // until cellV is Formula
-                    if (cellV.CellType.Equals("SpreadsheetUtilities.Formula"))  // Only formula need to be calculated
+                    if (cellV.cellContent.GetType() == typeof(Formula))  // Only formula need to be calculated
                         cellV.calculateFormula(myLookUp);
             }
 
@@ -344,7 +333,6 @@ namespace SS
             {
                 spreadSheetCell[name].CellContent = number;
                 spreadSheetCell[name].CellValue = number;
-                spreadSheetCell[name].CellType = number;
                 spreadSheetCell[name].ContentString = number.ToString();
             }
             // Reorder Dependency graph
@@ -376,7 +364,6 @@ namespace SS
             {
                 spreadSheetCell[name].CellContent = text;
                 spreadSheetCell[name].CellValue = text;
-                spreadSheetCell[name].CellType = text;
                 spreadSheetCell[name].ContentString = text;
             }
 
@@ -417,7 +404,6 @@ namespace SS
             {
                 prevContent = spreadSheetCell[name].CellContent;
                 prevValue = spreadSheetCell[name].CellValue;        // save previous data(content)
-                prevType = spreadSheetCell[name].CellType;
                 prevString = spreadSheetCell[name].ContentString;
 
                 foreach (string dept in dg.GetDependents(name))      // save dept list
@@ -442,7 +428,6 @@ namespace SS
                 {
                     spreadSheetCell[name].CellContent = fma;
                     spreadSheetCell[name].CellValue = fma;
-                    spreadSheetCell[name].CellType = fma;
                     spreadSheetCell[name].ContentString = "=" + fma.ToString();
                     // set the dependency graph according to the formula variables.
                     dg.ReplaceDependees(name, fma.GetVariables());
